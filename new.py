@@ -1,8 +1,8 @@
 '''
 
 author: Flora_Lin
-NewsGrabber and Analyzer
-Grabbing the news today and display in the GUI              #used module: wxPython, selenium, PhantomJS, BeautifulSoup
+NewsCrawler and Analyzer
+Crawling the news today and display in the GUI              #used module: wxPython, selenium, PhantomJS, BeautifulSoup
 Reach the news page on the GUI directly
 Extract the hottest area or country and make a bar chart    #used module: matplotlib,collections, pandas
 Extract the hottest words and create a wordcloud            #used module: jieba, wordcloud
