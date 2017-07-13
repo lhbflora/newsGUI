@@ -1,3 +1,13 @@
+'''
+
+author: Flora_Lin
+NewsGrabber and Analyzer
+Grabbing the news today and display in the GUI              #used module: wxPython, selenium, PhantomJS, BeautifulSoup
+Reach the news page on the GUI directly
+Extract the hottest area or country and make a bar chart    #used module: matplotlib,collections, pandas
+Extract the hottest words and create a wordcloud            #used module: jieba, wordcloud
+
+'''
 import time
 import matplotlib.pyplot as plt
 import pandas as pd
@@ -14,9 +24,9 @@ from matplotlib.font_manager import FontProperties
 from matplotlib.ticker import FormatStrFormatter
 
 ID_EVENT_RELOAD = 9999
-driver = webdriver.PhantomJS()
+driver = webdriver.PhantomJS()  #using PhantomJS to parse the JS webpage
 url = 'http://news.163.com/world/'
-#driver.get(url)
+
 
 
 class NewsGUI(wx.Frame):
@@ -26,6 +36,7 @@ class NewsGUI(wx.Frame):
     """docstring for NewsGUI."""
     def __init__(self, title):
         wx.Frame.__init__(self,None,title = title,size = (450,600))
+
         #set a Munu Bar on the top
         self.CreateStatusBar()
         menuBar = wx.MenuBar()
@@ -51,7 +62,7 @@ class NewsGUI(wx.Frame):
 
         search_btn = wx.Button(panel, label = "Hot Areas")
         TextSizer.Add(search_btn)
-        self.Bind(wx.EVT_BUTTON, self.OnClickSearch, search_btn)
+        self.Bind(wx.EVT_BUTTON, self.OnClickSearch, search_btn)    #search for the most popular areas and countries
 
         cloud_btn = wx.Button(panel, label = "Hot Words")
         TextSizer.Add(cloud_btn)
@@ -63,7 +74,7 @@ class NewsGUI(wx.Frame):
         pos = self.list.InsertItem(0,"loading..")
         self.list.SetItem(pos,1,"--")
         self.list.SetItem(pos,2,"--")
-        self.Bind(wx.EVT_LIST_ITEM_ACTIVATED, self.OnDoubleClick, self.list)
+        self.Bind(wx.EVT_LIST_ITEM_ACTIVATED, self.OnDoubleClick, self.list)  #Double click to reach the news page
 
         sizer = wx.BoxSizer(wx.VERTICAL)
         sizer.Add(TextSizer, 0, wx.ALL, 5)
@@ -95,12 +106,12 @@ class NewsGUI(wx.Frame):
     def FetchContent(self,rurl):
         print('Fetching url: '+rurl+'.......')
         driver.get(rurl)
-        markup = driver.page_source
+        markup = driver.page_source   #Parse taget page source
 
         self.scroll_down(driver = driver, times = 3)
         pattern = BeautifulSoup(markup, 'lxml')
         time.sleep(3)
-        all_title = BeautifulSoup(markup, 'lxml').find_all('div', class_='news_title')
+        all_title = BeautifulSoup(markup, 'lxml').find_all('div', class_='news_title')  #Extract the source code to extract title, time and address
         time_stamp_list = pattern.find_all('span', class_= 'time')
         title_list = []
         time_list = []
@@ -134,6 +145,8 @@ class NewsGUI(wx.Frame):
         self.Destroy()
 
     def OnClickSearch(self,event):
+        #extract words whose flag means the name of countries and areas
+        #sort the areas by frequency and display the bar chart of statistical data
         font = FontProperties(fname=r"c:\windows\fonts\simsun.ttc", size=14)
         with open('title.txt','r',encoding = 'gbk') as f:
             title_text = f.readlines()
@@ -161,7 +174,7 @@ class NewsGUI(wx.Frame):
         for label in fig.get_xticklabels() :
             label.set_fontproperties(font)
         ymajorFormatter = FormatStrFormatter('%d') #设置y轴标签文本的格式
-        fig.yaxis.set_major_formatter(ymajorFormatter)  
+        fig.yaxis.set_major_formatter(ymajorFormatter)
         fig.set_title('Hot Areas')
         fig.set_xlabel("Areas")
         fig.set_ylabel("Frequency")
@@ -181,6 +194,7 @@ class NewsGUI(wx.Frame):
         # return title_text
 
     def OnClickCloud(self,event):
+        #create wordcloud and show the data in the color of the mask image 
         self.retrieve_title()
         with open('title.txt','r',encoding = 'gbk') as f:
             title_text = f.readlines()
